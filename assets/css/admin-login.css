@@ -1,0 +1,12 @@
+.form-control, .btn, .input-group-text {
+	height: 45px !important;
+}
+
+.btn {
+	font-size: 14px;
+}
+
+.input-group-text i{
+	color: #5D87FF !important;
+	font-size: 18px !important;
+}
