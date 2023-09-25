@@ -103,6 +103,8 @@ ob_start();
                     <div class="col-sm-3 mb-3 mb-md-0">
                         <select class="form-control" name="filter_building" id="filter_building">
                             <option selected value="">SELECT STATUS</option>
+                            <option value="Ongoing">ONGOING</option>
+                            <option value="Done">DONE</option>
                         </select>
                     </div>
                     <div class="col-sm-3">
@@ -123,80 +125,6 @@ ob_start();
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>CSO</td>
-                                <td>69940441</td>
-                                <td>REQUEST</td>
-                                <td>Letter</td>
-                                <td><span class="bg-warning text-white px-2 py-1">Ongoing</span></td>
-                                <td>2023-09-12</td>
-                                <td><button class="btn btn-primary dropdown-toggle my-dropdown" type="button"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                        data-id=""><i class="fa-solid fa-ellipsis"></i></button>
-                                    <div class="dropdown-menu"> <a class="dropdown-item text-primary"
-                                            href="javascript:void(0)" id="get_edit" data-id=""><i
-                                                class="fa-solid fa-pen-to-square mr-3"></i>Edit</a> <a
-                                            class="dropdown-item text-danger" href="javascript:void(0)" id="get_delete"
-                                            data-id=""><i class="fa-solid fa-trash mr-3"></i>Delete</a> </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>CSO</td>
-                                <td>76361550</td>
-                                <td>REQUEST</td>
-                                <td>Letter</td>
-                                <td><span class="bg-warning text-white px-2 py-1">Ongoing</span></td>
-                                <td>2023-09-12</td>
-                                <td><button class="btn btn-primary dropdown-toggle my-dropdown" type="button"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                        data-id=""><i class="fa-solid fa-ellipsis"></i></button>
-                                    <div class="dropdown-menu"> <a class="dropdown-item text-primary"
-                                            href="javascript:void(0)" id="get_edit" data-id=""><i
-                                                class="fa-solid fa-pen-to-square mr-3"></i>Edit</a> <a
-                                            class="dropdown-item text-danger" href="javascript:void(0)" id="get_delete"
-                                            data-id=""><i class="fa-solid fa-trash mr-3"></i>Delete</a> </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>TRAFFIC</td>
-                                <td>14490897</td>
-                                <td>Voucher</td>
-                                <td>Voucher</td>
-                                <td><span class="bg-warning text-white px-2 py-1">Ongoing</span></td>
-                                <td>2023-09-12</td>
-                                <td><button class="btn btn-primary dropdown-toggle my-dropdown" type="button"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                        data-id=""><i class="fa-solid fa-ellipsis"></i></button>
-                                    <div class="dropdown-menu"> <a class="dropdown-item text-primary"
-                                            href="javascript:void(0)" id="get_edit" data-id=""><i
-                                                class="fa-solid fa-pen-to-square mr-3"></i>Edit</a> <a
-                                            class="dropdown-item text-danger" href="javascript:void(0)" id="get_delete"
-                                            data-id=""><i class="fa-solid fa-trash mr-3"></i>Delete</a> </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>TRAFFIC</td>
-                                <td>96710603</td>
-                                <td>Memo</td>
-                                <td>Memo</td>
-                                <td><span class="bg-primary text-white px-2 py-1">Done</span></td>
-                                <td>2023-09-12</td>
-                                <td><button class="btn btn-primary dropdown-toggle my-dropdown" type="button"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                        data-id=""><i class="fa-solid fa-ellipsis"></i></button>
-                                    <div class="dropdown-menu"> <a class="dropdown-item text-primary"
-                                            href="javascript:void(0)" id="get_edit" data-id=""><i
-                                                class="fa-solid fa-pen-to-square mr-3"></i>Edit</a> <a
-                                            class="dropdown-item text-danger" href="javascript:void(0)" id="get_delete"
-                                            data-id=""><i class="fa-solid fa-trash mr-3"></i>Delete</a> </div>
-                                </td>
-                            </tr>
-                        </tbody>
                     </table>
                 </div>
             </div>
@@ -215,16 +143,15 @@ $(document).ready(function() {
     var dataTable = $('#table').DataTable({
         "serverSide": true,
         "paging": true,
-        "searching": false,
+        "searching": true,
         "pagingType": "simple",
         "scrollX": true,
         "sScrollXInner": "100%",
         "ajax": {
-            url: "./controller/datatables.php",
+            url: "../../backend/datatables/admin/documents",
             type: "POST",
             data: function(d) {
                 return $.extend({}, d, {
-                    "room": true,
                     "filter_building": $('#filter_building').val()
                 })
             },
@@ -241,10 +168,37 @@ $(document).ready(function() {
         ]
     });
 
+    // Initialize a flag to check if the dropdown is open
+    var dropdownOpen = false;
+
+    // Initialize a timestamp for the last dropdown click
+    var lastDropdownClick = 0;
+
+    var id = 0;
+
+    // Handle dropdown click to set the flag and update the timestamp
+    $('#table').on('click', '.my-dropdown', function(event) {
+        id = $(this).data('id');
+        console.log(id);
+        dropdownOpen = true;
+        lastDropdownClick = Date.now();
+    });
+
+    // Handle document click to close the dropdown if it's open
+    $(document).on('click', function() {
+        if (dropdownOpen) {
+            dropdownOpen = false;
+        }
+    });
+
     $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
 
     setInterval(function() {
-        dataTable.ajax.reload(null, false);
+        if (dropdownOpen && Date.now() - lastDropdownClick >= 60000) {
+            // Close the dropdown
+            $('.my-dropdown[data-id="' + id + '"]').dropdown("toggle");
+            dropdownOpen = false;
+        }
     }, 10000); // END DATATABLES
 
     dataTable.draw();

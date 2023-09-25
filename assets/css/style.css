@@ -1683,7 +1683,7 @@ h6 .badge {
   font-size: 13px; }
 
 .dropdown-menu {
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
   border: none;
   width: 200px; }
   .dropdown-menu.show {
@@ -2768,4 +2768,13 @@ button.dropdown-toggle::after {
 
 button.my-dropdown {
   padding: 1px 10px !important;
+}
+
+.dropdown-menu a {
+  color: #868e96 !important;
+}
+
+.dropdown-menu a:hover {
+  background: #5D87FF !important;
+  color: #fff !important;
 }

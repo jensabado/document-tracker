@@ -1,18 +1,19 @@
 <?php
+require_once('../../config/database.php');
+require_once('../../config/connection.php');
 
 $column = array('id', 'building_name', 'room');
 
-$query = "SELECT * FROM documents WHERE is_deleted = 0";
-
-if ($_POST['filter_building'] != '') {
-    $query .= 'AND tbl_room.building_id = "' . $_POST['filter_building'] . '"';
-}
+$query = "SELECT * FROM documents WHERE is_deleted = 0 AND hidden = 0";
 
 if (isset($_POST['search']['value'])) {
     $query .= '
-        AND (tbl_room.id LIKE "%' . $_POST['search']['value'] . '%"
-        OR tbl_building.building LIKE "%' . $_POST['search']['value'] . '%" 
-        OR tbl_room.room LIKE "%' . $_POST['search']['value'] . '%" )
+        AND (sender LIKE "%' . $_POST['search']['value'] . '%"
+        OR reference LIKE "%' . $_POST['search']['value'] . '%" 
+        OR document LIKE "%' . $_POST['search']['value'] . '%" 
+        OR type LIKE "%' . $_POST['search']['value'] . '%" 
+        OR date LIKE "%' . $_POST['search']['value'] . '%" 
+        OR status LIKE "%' . $_POST['search']['value'] . '%" )
         ';
 }
 
@@ -28,13 +29,13 @@ if ($_POST['length'] != -1) {
     $query1 = 'LIMIT ' . $_POST['start'] . ', ' . $_POST['length'];
 }
 
-$statement = $connect->prepare($query);
+$statement = $pdo->prepare($query);
 
 $statement->execute();
 
 $number_filter_row = $statement->rowCount();
 
-$statement = $connect->prepare($query . $query1);
+$statement = $pdo->prepare($query . $query1);
 
 $statement->execute();
 
@@ -42,30 +43,37 @@ $result = $statement->fetchAll();
 
 $data = array();
 
+$count = 1;
+
 foreach ($result as $row) {
+    $action = '<button class="btn btn-primary dropdown-toggle my-dropdown" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="' . $row['id'] . '"><i class="fa-solid fa-caret-down"></i></button> <div class="dropdown-menu"> <a class="dropdown-item" href="javascript:void(0)" id="get_done" data-id="' . $row['id'] . '"><i class="fa-solid fa-check mr-3"></i>Done</a> <a class="dropdown-item" href="javascript:void(0)" id="get_edit" data-id="' . $row['id'] . '"><i class="fa-regular fa-pen-to-square mr-3"></i>Edit</a> <a class="dropdown-item" href="javascript:void(0)" id="get_print" data-id="' . $row['id'] . '"><i class="fa-solid fa-print mr-3"></i>Print QR</a><a class="dropdown-item" href="javascript:void(0)" id="get_track" data-id="' . $row['id'] . '"><i class="fa-solid fa-magnifying-glass-location mr-3"></i>Track</a> <a class="dropdown-item" href="javascript:void(0)" id="get_delete" data-id="' . $row['id'] . '"><i class="fa-regular fa-trash-can mr-3"></i>Delete</a> </div>';
+
+    if($row['status'] == 'Done') {
+        $action = '<button class="btn btn-primary dropdown-toggle my-dropdown" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="' . $row['id'] . '"><i class="fa-solid fa-caret-down"></i></button> <div class="dropdown-menu"> <a class="dropdown-item" href="javascript:void(0)" id="get_hide" data-id="' . $row['id'] . '"><i class="fa-regular fa-eye-slash mr-3"></i></i>Hide</a> <a class="dropdown-item" href="javascript:void(0)" id="get_details" data-id="' . $row['id'] . '"><i class="fa-solid fa-circle-info mr-3"></i>Details</a> </div>';
+    }
     $sub_array = array();
-    $sub_array[] = '#' . $row['id'];
-    $sub_array[] = ucwords($row['building']);
-    $sub_array[] = ucwords($row['room']);
-    $sub_array[] = '<div class="d-flex flex-row align-items-center gap-2" style="gap: 5px;"> <button type="button" class="btn btn-primary d-flex align-items-center gap-1" id="get_edit" data-id="' . $row['id'] . '"><i class="fa-regular fa-pen-to-square"></i></button> <button type="button" class="btn btn-danger d-flex align-items-center gap-1" id="get_delete" data-id="' . $row['id'] . '"><i class="fa-solid fa-trash"></i></button></div>';
+    $sub_array[] = $count++;
+    $sub_array[] = ucwords($row['sender']);
+    $sub_array[] = ucwords($row['reference']);
+    $sub_array[] = ucwords($row['document']);
+    $sub_array[] = ucwords($row['type']);
+    $sub_array[] = $row['status'] == 'Ongoing' ? '<span class="bg-warning text-white px-2 py-1">Ongoing</span>' : '<span class="bg-primary text-white px-2 py-1">Done</span>';
+    $sub_array[] = $row['date'];
+    $sub_array[] = $action;
     $data[] = $sub_array;
 }
 
-function count_all_data($connect)
+function count_all_data($pdo)
 {
-    $query = "SELECT tbl_room.id, tbl_building.building, tbl_room.room
-        FROM tbl_room
-        LEFT JOIN tbl_building
-        ON tbl_room.building_id = tbl_building.id
-        WHERE tbl_building.is_deleted = 'no' AND tbl_room.is_deleted = 'no'";
-    $statement = $connect->prepare($query);
+    $query = "SELECT * FROM documents WHERE is_deleted = 0 AND hidden = 0";
+    $statement = $pdo->prepare($query);
     $statement->execute();
     return $statement->rowCount();
 }
 
 $output = array(
     'draw' => intval($_POST['draw']),
-    'recordsTotal' => count_all_data($connect),
+    'recordsTotal' => count_all_data($pdo),
     'recordsFiltered' => $number_filter_row,
     'data' => $data,
 );
