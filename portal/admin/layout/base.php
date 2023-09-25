@@ -45,8 +45,8 @@ if(!isset($_SESSION['dt_admin_id'])) {
 <body>
     <div id="app">
         <div class="main-wrapper main-wrapper-1">
-            <div class="navbar-bg"></div>
-            <nav class="navbar navbar-expand-lg main-navbar">
+            <div class="navbar-bg" style="position: fixed; top: 0; z-index:100;"></div>
+            <nav class="navbar navbar-expand-lg main-navbar" style="position: fixed; top: 0; z-index:200;">
                 <form class="form-inline mr-auto">
                     <ul class="navbar-nav mr-3">
                         <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i
@@ -57,7 +57,7 @@ if(!isset($_SESSION['dt_admin_id'])) {
                     <li class="dropdown"><a href="#" data-toggle="dropdown"
                             class="nav-link dropdown-toggle nav-link-lg nav-link-user">
                             <img alt="image" src="../../assets/img/avatar/avatar-1.png" class="rounded-circle mr-1">
-                            <div class="d-sm-none d-lg-inline-block"><?= strtoupper($_SESSION['dt_admin_username']) ?></div>
+                            <div class="d-inline-block"><?= strtoupper($_SESSION['dt_admin_username']) ?></div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
                             <a href="features-profile.html" class="dropdown-item has-icon">

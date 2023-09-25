@@ -88,11 +88,11 @@ ob_start();
 </div>
 
 <section class="section">
-    <div class="section-header">
+    <div class="section-header" style="position: fixed; top: 80px; width: 100%; z-index: 200;">
         <h1>Documents</h1>
     </div>
 
-    <div class="section-body">
+    <div class="section-body" style="margin-top: 90px;">
         <div class="card">
             <div class="card-header">
                 <button class="btn btn-primary" id="add_building"><i class="fa-solid fa-plus pr-1"></i> ADD

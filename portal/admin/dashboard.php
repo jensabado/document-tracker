@@ -5,10 +5,10 @@ $page_title = 'Dashboard';
 ob_start();
 ?>
 <section class="section">
-    <div class="section-header">
+    <div class="section-header" style="position: fixed; top: 80px; width: 100%; z-index: 200;">
         <h1>Dashboard</h1>
     </div>
-    <div class="section-body">
+    <div class="section-body" style="margin-top: 90px;">
         <div class="row d-flex flex-row align-items-stretch">
             <div class="col-xl-4 col-md-6 col-sm-6 col-12" style="margin-bottom: 30px">
                 <div class="card shadow px-3 h-100 d-flex justify-content-center">
