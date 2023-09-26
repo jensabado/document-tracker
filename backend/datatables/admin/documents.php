@@ -2,9 +2,13 @@
 require_once('../../config/database.php');
 require_once('../../config/connection.php');
 
-$column = array('id', 'building_name', 'room');
+$column = array('id', 'department', 'reference', 'document', 'details', 'type', 'status', 'date');
 
 $query = "SELECT * FROM documents WHERE is_deleted = 0 AND hidden = 0";
+
+if ($_POST['filter_status'] != '') {
+    $query .= ' AND status = "' . $_POST['filter_status'] . '"';
+}
 
 if (isset($_POST['search']['value'])) {
     $query .= '
@@ -12,7 +16,7 @@ if (isset($_POST['search']['value'])) {
         OR reference LIKE "%' . $_POST['search']['value'] . '%" 
         OR document LIKE "%' . $_POST['search']['value'] . '%" 
         OR type LIKE "%' . $_POST['search']['value'] . '%" 
-        OR date LIKE "%' . $_POST['search']['value'] . '%" 
+        OR created LIKE "%' . $_POST['search']['value'] . '%" 
         OR status LIKE "%' . $_POST['search']['value'] . '%" )
         ';
 }
@@ -20,7 +24,7 @@ if (isset($_POST['search']['value'])) {
 if (isset($_POST['order'])) {
     $query .= 'ORDER BY ' . $column[$_POST['order']['0']['column']] . ' ' . $_POST['order']['0']['dir'] . ' ';
 } else {
-    $query .= 'ORDER BY id DESC ';
+    $query .= 'ORDER BY created DESC ';
 }
 
 $query1 = '';
@@ -43,22 +47,34 @@ $result = $statement->fetchAll();
 
 $data = array();
 
-$count = 1;
+$count = ($_POST['start'] / $_POST['length']) * $_POST['length'] + 1;
 
 foreach ($result as $row) {
-    $action = '<button class="btn btn-primary dropdown-toggle my-dropdown" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="' . $row['id'] . '"><i class="fa-solid fa-caret-down"></i></button> <div class="dropdown-menu"> <a class="dropdown-item" href="javascript:void(0)" id="get_done" data-id="' . $row['id'] . '"><i class="fa-solid fa-check mr-3"></i>Done</a> <a class="dropdown-item" href="javascript:void(0)" id="get_edit" data-id="' . $row['id'] . '"><i class="fa-regular fa-pen-to-square mr-3"></i>Edit</a> <a class="dropdown-item" href="javascript:void(0)" id="get_print" data-id="' . $row['id'] . '"><i class="fa-solid fa-print mr-3"></i>Print QR</a><a class="dropdown-item" href="javascript:void(0)" id="get_track" data-id="' . $row['id'] . '"><i class="fa-solid fa-magnifying-glass-location mr-3"></i>Track</a> <a class="dropdown-item" href="javascript:void(0)" id="get_delete" data-id="' . $row['id'] . '"><i class="fa-regular fa-trash-can mr-3"></i>Delete</a> </div>';
 
-    if($row['status'] == 'Done') {
-        $action = '<button class="btn btn-primary dropdown-toggle my-dropdown" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="' . $row['id'] . '"><i class="fa-solid fa-caret-down"></i></button> <div class="dropdown-menu"> <a class="dropdown-item" href="javascript:void(0)" id="get_hide" data-id="' . $row['id'] . '"><i class="fa-regular fa-eye-slash mr-3"></i></i>Hide</a> <a class="dropdown-item" href="javascript:void(0)" id="get_details" data-id="' . $row['id'] . '"><i class="fa-solid fa-circle-info mr-3"></i>Details</a> </div>';
+    if ($row['status'] == 'Done') {
+        $action = '<div class="btn-group dropleft">
+        <button class="btn btn-primary dropdown-toggle my-dropdown" style="position: relative !important; z-index: 1;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="' . $row['id'] . '"><span class="pl-1">View Option</span></button> 
+        <div class="dropdown-menu px-2 w-auto" style="position: absolute; z-index: 2;"> <a class="dropdown-item" href="javascript:void(0)" id="get_hide" data-id="' . $row['id'] . '"><i class="fa-regular fa-eye-slash mr-3"></i></i>Hide</a> <a class="dropdown-item" href="javascript:void(0)" id="get_details" data-id="' . $row['id'] . '"><i class="fa-solid fa-circle-info mr-3"></i>Details</a> </div></div>';
+    } else {
+        $action = '<div class="btn-group dropleft">
+        <button class="btn btn-primary dropdown-toggle my-dropdown d-flex align-items-center" style="position: relative !important; z-index: 1;" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="' . $row['id'] . '"><span class="pl-1">View Option</span></button>
+        <div class="dropdown-menu my-dropdown-menu px-2 w-auto"> 
+        <a class="dropdown-item" href="javascript:void(0)" id="get_done" data-id="' . $row['id'] . '"><i class="fa-solid fa-check mr-3"></i>Done</a> 
+        <a class="dropdown-item" href="javascript:void(0)" id="get_edit" data-id="' . $row['id'] . '"><i class="fa-regular fa-pen-to-square mr-3"></i>Edit</a>
+        <a class="dropdown-item" href="javascript:void(0)" id="get_print" data-id="' . $row['reference'] . '"><i class="fa-solid fa-print mr-3"></i>Print QR</a>
+        <a class="dropdown-item" href="javascript:void(0)" id="get_track" data-id="' . $row['id'] . '"><i class="fa-solid fa-magnifying-glass-location mr-3"></i>Track</a> 
+        <a class="dropdown-item" href="javascript:void(0)" id="get_delete" data-id="' . $row['id'] . '"><i class="fa-regular fa-trash-can mr-3"></i>Delete</a> </div></div>';
     }
+
     $sub_array = array();
     $sub_array[] = $count++;
     $sub_array[] = ucwords($row['sender']);
     $sub_array[] = ucwords($row['reference']);
     $sub_array[] = ucwords($row['document']);
+    $sub_array[] = ucwords($row['details']);
     $sub_array[] = ucwords($row['type']);
     $sub_array[] = $row['status'] == 'Ongoing' ? '<span class="bg-warning text-white px-2 py-1">Ongoing</span>' : '<span class="bg-primary text-white px-2 py-1">Done</span>';
-    $sub_array[] = $row['date'];
+    $sub_array[] = $row['created'];
     $sub_array[] = $action;
     $data[] = $sub_array;
 }

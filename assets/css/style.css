@@ -1687,7 +1687,7 @@ h6 .badge {
   border: none;
   width: 200px; }
   .dropdown-menu.show {
-    display: block !important; }
+    display: flex !important; }
   .dropdown-menu a {
     font-size: 13px; }
   .dropdown-menu .dropdown-title {
@@ -2762,12 +2762,17 @@ button.dropdown-toggle:hover {
   background: #3067ff !important;
 }
 
-button.dropdown-toggle::after {
+button.dropdown-toggle.dropleft::after {
   content: none; /* Set content to an empty string */
+  display: none !important;
 }
 
 button.my-dropdown {
   padding: 1px 10px !important;
+}
+
+table tbody tr td .dropdown-menu.show {
+  z-index: 2000 !important;
 }
 
 .dropdown-menu a {
