@@ -81,7 +81,7 @@ if(isset($_GET['reference'])) {
     ?>
     <div class="container-fluid mt-4">
         <div class="receipt">
-            <div class="qr-code fixed-bottom" style="margin-left: 580px">
+            <div class="qr-code fixed-top" style="margin-left: 580px">
                 <?= generate_qrcode(qrcode_link($reference), 140) ?>
             </div>
         </div>

@@ -1687,7 +1687,7 @@ h6 .badge {
   border: none;
   width: 200px; }
   .dropdown-menu.show {
-    display: flex !important; }
+    display: block !important; z-index: 9999; }
   .dropdown-menu a {
     font-size: 13px; }
   .dropdown-menu .dropdown-title {
@@ -2777,4 +2777,8 @@ table tbody tr td .dropdown-menu.show {
 .dropdown-menu a:hover {
   background: #5D87FF !important;
   color: #fff !important;
+}
+
+.dataTables_wrapper, .table-responsive, div.table-responsive>div.dataTables_wrapper>div.row, div.table-responsive>div.dataTables_wrapper>div.row>div[class^="col-"]:last-child {
+  z-index: 1 !important;
 }
