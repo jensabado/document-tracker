@@ -2762,11 +2762,6 @@ button.dropdown-toggle:hover {
   background: #3067ff !important;
 }
 
-button.dropdown-toggle.dropleft::after {
-  content: none; /* Set content to an empty string */
-  display: none !important;
-}
-
 button.my-dropdown {
   padding: 1px 10px !important;
 }
