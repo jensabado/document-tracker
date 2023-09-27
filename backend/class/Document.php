@@ -71,10 +71,14 @@ class Document
             if ($row) {
                 $result = array(
                     'status' => 'success',
+                    'id' => $row['id'],
                     'reference' => $row['reference'],
+                    'department' => $row['sender'],
                     'document' => $row['document'],
                     'details' => $row['details'],
                     'type' => $row['type'],
+                    'document_status' => strtoupper($row['status']),
+                    'date' => $row['created'],
                 );
             }
         } else {
@@ -124,6 +128,11 @@ if(isset($_POST['change_status'])) {
 }
 
 if(isset($_POST['get_document_info'])) {
+    $id = $_POST['document_id'];
+    $Doc->get_document_info($id);
+}
+
+if(isset($_POST['get_document_info_show'])) {
     $id = $_POST['document_id'];
     $Doc->get_document_info($id);
 }

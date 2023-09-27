@@ -95,8 +95,7 @@ if(!isset($_SESSION['dt_admin_id'])) {
                                 <span>Track Document</span></a></li>
                         <li><a class="nav-link" href="user"><i class="fas fa-solid fa-users"></i>
                                 <span>Users</span></a></li>
-                        <li><a class="nav-link" href="archive"><i class="fas fa-solid fa-box-archive"></i>
-                                <span>Archive</span></a></li>
+                        <span>Archive</span></a></li>
                         <li><a class="nav-link" href="settings"><i class="fas fa-solid fa-gears"></i>
                                 <span>Settings</span></a></li>
                         <!-- <li class="menu-header">Stisla</li>

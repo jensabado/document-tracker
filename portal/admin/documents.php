@@ -5,6 +5,69 @@ $page_title = 'Documents';
 ob_start();
 
 ?>
+<div class="modal fade" tabindex="-1" role="dialog" id="show_modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Show Document</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" id="add_document_form">
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="" class="font-weight-bold">Reference:</label>
+                            <p id="show_reference">r86868we</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="" class="font-weight-bold">Department:</label>
+                            <p id="show_department">Lorem ipsum dolor sit amet.</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="" class="font-weight-bold">Document Title:</label>
+                            <p id="show_document">Lorem, ipsum.</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="" class="font-weight-bold">Document Details:</label>
+                            <p id="show_details">Lorem ipsum dolor sit amet.</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="" class="font-weight-bold">Document Type:</label>
+                            <p id="show_type">Lorem, ipsum dolor.</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="" class="font-weight-bold">Status:</label>
+                            <p id="show_status">Lorem.</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="" class="font-weight-bold">Date:</label>
+                            <p id="show_date">2023-09-12 07:23:00</p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-whitesmoke br" id="show_modal_footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a href="#" class="btn disabled btn-primary btn-progress d-none spinner">Progress</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" tabindex="-1" role="dialog" id="add_modal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -59,7 +122,7 @@ ob_start();
                                 required>
                                 <option disabled value="" selected>SELECT</option>';
                                 <?php
-                                $stmt = $pdo->prepare("SELECT category FROM category WHERE is_deleted = 0");
+                                $stmt = $pdo->prepare("SELECT category FROM category");
                                 $stmt->execute();
                                 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             
@@ -100,7 +163,8 @@ ob_start();
                     <div class="row mb-3">
                         <div class="col-12">
                             <label for="">Reference</label>
-                            <input type="text" name="edit_reference" id="edit_reference" class="form-control" placeholder="Reference" readonly inputmode="number">
+                            <input type="text" name="edit_reference" id="edit_reference" class="form-control"
+                                placeholder="Reference" readonly inputmode="number">
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -124,7 +188,7 @@ ob_start();
                                 required>
                                 <option disabled value="" selected>SELECT</option>';
                                 <?php
-                                $stmt = $pdo->prepare("SELECT category FROM category WHERE is_deleted = 0");
+                                $stmt = $pdo->prepare("SELECT category FROM category");
                                 $stmt->execute();
                                 $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             
@@ -244,37 +308,10 @@ $(document).ready(function() {
         ]
     });
 
-    // Initialize a flag to check if the dropdown is open
-    var dropdownOpen = false;
-
-    // Initialize a timestamp for the last dropdown click
-    var lastDropdownClick = 0;
-
-    var id = 0;
-
-    // Handle dropdown click to set the flag and update the timestamp
-    $('#table').on('click', '.my-dropdown', function(event) {
-        id = $(this).data('id');
-        console.log(id);
-        dropdownOpen = true;
-        lastDropdownClick = Date.now();
-    });
-
-    // Handle document click to close the dropdown if it's open
-    $(document).on('click', function() {
-        if (dropdownOpen) {
-            dropdownOpen = false;
-        }
-    });
-
     $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
 
     setInterval(function() {
-        if (dropdownOpen && Date.now() - lastDropdownClick >= 60000) {
-            // Close the dropdown
-            $('.my-dropdown[data-id="' + id + '"]').dropdown("toggle");
-            dropdownOpen = false;
-        }
+        dataTable.ajax.reload(null, false);
     }, 10000); // END DATATABLES
 
     dataTable.draw();
@@ -307,6 +344,103 @@ $(document).ready(function() {
         e.preventDefault();
 
         $('#add_modal').modal('show');
+    })
+
+    // show modal
+    $(document).on('click', '#get_view', function(e) {
+        e.preventDefault();
+
+        let document_id = $(this).data('id');
+        let form = new FormData();
+        form.append('get_document_info_show', true);
+        form.append('document_id', document_id);
+
+        $.ajax({
+            type: "POST",
+            url: "../../backend/class/Document.php",
+            data: form,
+            processData: false,
+            contentType: false,
+            cache: false,
+            success: function(response) {
+                console.log(response);
+                let data = JSON.parse(response);
+                if (data.status == 'success') {
+                    $('#show_modal').modal('show');
+                    $('#show_reference').text(data.reference);
+                    $('#show_department').text(data.department);
+                    $('#show_document').text(data.document);
+                    $('#show_details').text(data.details);
+                    $('#show_type').text(data.type);
+                    $('#show_status').html(data.document_status == 'ONGOING' ?
+                        '<span class="bg-warning text-white px-2 py-1">ONGOING</span>' :
+                        '<span class="bg-primary text-white px-2 py-1">DONE</span>');
+                    $('#show_date').text(data.date);
+
+                    if (data.document_status == 'ONGOING') {
+                        $('#show_modal_footer').append(
+                            '<button type="button" class="btn btn-success" id="get_done" data-id="' +
+                            data.id +
+                            '"><i class="fa-solid fa-check mr-1"></i>Done</button>');
+                        $('#show_modal_footer').append(
+                            '<button type="button" class="btn btn-warning" id="get_edit" data-id="' +
+                            data.id +
+                            '"><i class="fa-regular fa-pen-to-square mr-1"></i>Edit</button>'
+                        );
+
+                        $('#show_modal_footer').append(
+                            '<button type="button" class="btn btn-primary" id="get_print" data-id="' +
+                            data.reference +
+                            '"><i class="fa-solid fa-print mr-1"></i>Print QR</button>'
+                        );
+
+                        $('#show_modal_footer').append(
+                            '<button type="button" class="btn btn-info" id="get_track" data-id="' +
+                            data.reference +
+                            '"><i class="fa-solid fa-magnifying-glass-location mr-1"></i>Track</button>'
+                        );
+                    } else {
+                        $('#show_modal_footer').append(
+                            '<button type="button" class="btn btn-danger" id="get_hide" data-id="' +
+                            data.id +
+                            '"><i class="fa-regular fa-eye-slash mr-1"></i></i>Hide</button>'
+                        );
+
+                        $('#show_modal_footer').append(
+                            '<button type="button" class="btn btn-info" id="get_details" data-id="' +
+                            data.id +
+                            '"><i class="fa-solid fa-circle-info mr-1"></i>Details</button>'
+                        );
+                    }
+                } else if (data.status == 'failed') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed!',
+                        text: data.message,
+                        iconColor: '#5D87FF',
+                        confirmButtonColor: '#5D87FF',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        timerProgressBar: true,
+                        color: '#000',
+                        background: '#fff',
+                    })
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed!',
+                        text: 'Something went wrong!',
+                        iconColor: '#5D87FF',
+                        confirmButtonColor: '#5D87FF',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        timerProgressBar: true,
+                        color: '#000',
+                        background: '#fff',
+                    })
+                }
+            }
+        })
     })
 
     // - submit add modal
@@ -393,6 +527,7 @@ $(document).ready(function() {
                         console.log(response);
                         let data = JSON.parse(response);
                         if (data.status == 'success') {
+                            $('#show_modal').modal('hide');
                             dataTable.ajax.reload(null, false);
                             Swal.fire({
                                 icon: 'success',
@@ -459,13 +594,14 @@ $(document).ready(function() {
             success: function(response) {
                 console.log(response);
                 let data = JSON.parse(response);
-                if(data.status == 'success') {
+                if (data.status == 'success') {
+                    $('#show_modal').modal('hide');
                     $('#edit_modal').modal('show');
                     $('#edit_reference').val(data.reference);
                     $('#edit_document_name').val(data.document);
                     $('#edit_details').val(data.details);
                     $('#edit_type').val(data.type).trigger('change');
-                } else if(data.status == 'failed') {
+                } else if (data.status == 'failed') {
                     Swal.fire({
                         icon: 'error',
                         title: 'Failed!',
@@ -496,7 +632,6 @@ $(document).ready(function() {
         })
     })
 
-    // submit edit building
     $(document).on('submit', '#edit_document_form', function(e) {
         e.preventDefault();
 
@@ -552,7 +687,18 @@ $(document).ready(function() {
 
         let reference = $(this).data('id');
 
-        window.open('./document-details?reference='+reference, '_blank');
+        window.open('./document-details?reference=' + reference, '_blank');
+        // console.log('./document-details?reference=' + reference);
+    })
+
+    // get track
+    $(document).on('click', '#get_track', function(e) {
+        e.preventDefault();
+
+        let reference = $(this).data('id');
+
+        window.open('./document-track?reference=' + reference, '_blank');
+        // console.log('./document-details?reference=' + reference);
     })
 
     // delete info
@@ -629,6 +775,12 @@ $(document).ready(function() {
     $('#edit_modal').on('hidden.bs.modal', function() {
         $(this).find('form').trigger('reset');
     });
+
+    $('#show_modal').on('hidden.bs.modal', function() {
+        // Remove all modal footer buttons except the close button
+        $('#show_modal_footer button:not([data-dismiss="modal"])').remove();
+    });
+
 })
 </script>
 <?php
