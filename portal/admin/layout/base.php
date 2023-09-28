@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 if(!isset($_SESSION['dt_admin_id'])) {
     echo '<script>
     window.location.href = "../../login";
@@ -56,12 +54,11 @@ if(!isset($_SESSION['dt_admin_id'])) {
                 <ul class="navbar-nav navbar-right">
                     <li class="dropdown"><a href="#" data-toggle="dropdown"
                             class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-                            <img alt="image" src="../../assets/img/avatar/avatar-1.png" class="rounded-circle mr-1">
                             <div class="d-inline-block"><?= strtoupper($_SESSION['dt_admin_username']) ?></div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a href="features-profile.html" class="dropdown-item has-icon">
-                                <i class="far fa-user"></i> Profile
+                            <a href="account-settings" class="dropdown-item has-icon">
+                                <i class="far fa-user"></i> Account Settings
                             </a>
                             <div class="dropdown-divider"></div>
                             <a href="javascript:void(0)" class="dropdown-item has-icon text-danger" id="logout">
@@ -91,13 +88,12 @@ if(!isset($_SESSION['dt_admin_id'])) {
                                 <span>Category</span></a></li>
                         <li><a class="nav-link" href="department"><i class="fas fa-solid fa-building"></i>
                                 <span>Department</span></a></li>
-                        <li><a class="nav-link" href="track"><i class="fas fa-solid fa-magnifying-glass-location"></i>
+                        <li><a class="nav-link" href="document-track"><i class="fas fa-solid fa-magnifying-glass-location"></i>
                                 <span>Track Document</span></a></li>
-                        <li><a class="nav-link" href="user"><i class="fas fa-solid fa-users"></i>
+                        <li><a class="nav-link" href="users"><i class="fas fa-solid fa-users"></i>
                                 <span>Users</span></a></li>
-                        <!-- <span>Archive</span></a></li> -->
-                        <li><a class="nav-link" href="settings"><i class="fas fa-solid fa-gears"></i>
-                                <span>Settings</span></a></li>
+                        <!-- <li><a class="nav-link" href="settings"><i class="fas fa-solid fa-gears"></i>
+                                <span>Settings</span></a></li> -->
                         <!-- <li class="menu-header">Stisla</li>
                         <li class="dropdown">
                             <a href="#" class="nav-link has-dropdown"><i class="fas fa-th-large"></i>
