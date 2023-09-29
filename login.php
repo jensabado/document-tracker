@@ -1,10 +1,16 @@
 <?php
 session_start();
 
-if(isset($_SESSION['dt_admin_id']) || isset($_SESSION['dt_dept_id'])) {
-    echo '<script>
-    window.location.href = "./portal/admin/dashboard";
-    </script>';
+if(isset($_SESSION['dt_admin_id']) && isset($_SESSION['dt_dept_id'])) {
+    if(isset($_SESSION['dt_admin_id'])) {
+        echo '<script>
+        window.location.href = "./portal/admin/dashboard";
+        </script>';
+    } else if(isset($_SESSION['dt_dept_id'])) {
+        echo '<script>
+        window.location.href = "./portal/department/dashboard";
+        </script>';
+    }
 }
 ?>
 
@@ -52,13 +58,15 @@ if(isset($_SESSION['dt_admin_id']) || isset($_SESSION['dt_dept_id'])) {
                             </div>
                             <div class="col-12 mb-3">
                                 <label>Username</label>
-                                <input type="text" class="form-control" name="username" id="username" value="<?php if(isset($_COOKIE['dt_username'])) { echo $_COOKIE['dt_username']; } ?>"
+                                <input type="text" class="form-control" name="username" id="username"
+                                    value="<?php if(isset($_COOKIE['dt_username'])) { echo $_COOKIE['dt_username']; } ?>"
                                     placeholder="Enter Username" required>
                             </div>
                             <div class="col-12 mb-2">
                                 <label>Password</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" name="password" id="password" value="<?php if(isset($_COOKIE['dt_password'])) { echo $_COOKIE['dt_password']; } ?>"
+                                    <input type="password" class="form-control" name="password" id="password"
+                                        value="<?php if(isset($_COOKIE['dt_password'])) { echo $_COOKIE['dt_password']; } ?>"
                                         placeholder="Enter Password" required>
                                     <span class="input-group-text" id="togglePassword">
                                         <i class="fa-solid fa-eye"></i>
@@ -67,8 +75,9 @@ if(isset($_SESSION['dt_admin_id']) || isset($_SESSION['dt_dept_id'])) {
                             </div>
                             <div class="col-12 mb-3">
                                 <div class="d-flex align-items-center">
-                                <input type="checkbox" name="rem" id="rem" <?php if (isset($_COOKIE["dt_username"]) && isset ($_COOKIE["dt_password"])) { echo "checked"; } ?>>
-                                <span class="pl-1">Remember me</span>
+                                    <input type="checkbox" name="rem" id="rem"
+                                        <?php if (isset($_COOKIE["dt_username"]) && isset ($_COOKIE["dt_password"])) { echo "checked"; } ?>>
+                                    <span class="pl-1">Remember me</span>
                                 </div>
                             </div>
                             <div class="col-12">
@@ -136,6 +145,7 @@ if(isset($_SESSION['dt_admin_id']) || isset($_SESSION['dt_dept_id'])) {
                 contentType: false,
                 cache: false,
                 success: function(response) {
+                    console.log(response);
                     let data = JSON.parse(response);
                     if (data.status == 'success') {
                         if (data.type == 'admin') {

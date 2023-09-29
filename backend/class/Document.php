@@ -113,7 +113,7 @@ $Doc = new Document($pdo);
 
 if(isset($_POST['add_document'])) {
     $reference = rand(10000000, 99999999);
-    $code = $_POST['add_code'];
+    $code = isset($_POST['dept']) ? $_SESSION['dt_dept_code'] : $_POST['add_code'];
     $document = $_POST['add_document_name'];
     $details = $_POST['add_details'];
     $type = $_POST['add_type'];

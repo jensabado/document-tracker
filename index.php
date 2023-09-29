@@ -1,2 +1,2 @@
 <?php
-header('Location: ./portal/admin/dashboard');
+header('Location: ./login');

@@ -2,7 +2,7 @@
 require_once('../config/database.php');
 require_once('../config/connection.php');
 
-class Category
+class Users
 {
     private $conn;
 
@@ -11,26 +11,29 @@ class Category
         $this->conn = $conn;
     }
 
-    public function add_category($category, $details, $max_time) {
-        $stmt = $this->conn->prepare("SELECT * FROM category WHERE category = :category");
-        $stmt->bindParam(":category", $category, PDO::PARAM_STR);
+    public function add_user($username, $password)
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = :username");
+        $stmt->bindParam(":username", $username, PDO::PARAM_STR);
         $stmt->execute();
 
-        if($stmt->rowCount() > 0) {
+        if ($stmt->rowCount() > 0) {
             $result = array(
                 'status' => 'failed',
-                'message' => ucwords($category) . ' already exist.'
+                'message' => ucwords($username) . ' username already exist.'
             );
         } else {
-            $stmt = $this->conn->prepare('INSERT INTO category (category, details, max_time) VALUES (:category, :details, :max_time)');
-            $stmt->bindParam(':category', $category, PDO::PARAM_STR);
-            $stmt->bindParam(':details', $details, PDO::PARAM_STR);
-            $stmt->bindParam(':max_time', $max_time, PDO::PARAM_INT);
-            
-            if($stmt->execute()) {
+            $stmt = $this->conn->prepare('INSERT INTO users (username, password, created_at) VALUES (:username, :password, :created_at)');
+            $hash = password_hash($password, PASSWORD_DEFAULT);
+            $created_at = date('Y-m-d h:i:s');
+            $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+            $stmt->bindParam(':password', $hash, PDO::PARAM_STR);
+            $stmt->bindParam(':created_at', $created_at, PDO::PARAM_STR);
+
+            if ($stmt->execute()) {
                 $result = array(
                     'status' => 'success',
-                    'message' => ucwords($category) . ' category added successfully.'
+                    'message' => ucwords($username) . ' user account added successfully.'
                 );
             }
         }
@@ -38,24 +41,25 @@ class Category
         echo json_encode($result);
     }
 
-    public function delete_category($id) {
-        $stmt = $this->conn->prepare("SELECT * FROM category WHERE id = :id");
+    public function delete_user($id)
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE id = :id");
         $stmt->bindParam(":id", $id, PDO::PARAM_INT);
         $stmt->execute();
 
-        if($stmt->rowCount() <= 0) {
+        if ($stmt->rowCount() <= 0) {
             $result = array(
                 'status' => 'failed',
-                'message' => 'No category found.',
+                'message' => 'No user account found.',
             );
         } else {
-            $stmt = $this->conn->prepare("DELETE FROM category WHERE id = :id");
+            $stmt = $this->conn->prepare("DELETE FROM users WHERE id = :id");
             $stmt->bindParam(":id", $id, PDO::PARAM_INT);
 
-            if($stmt->execute()) {
+            if ($stmt->execute()) {
                 $result = array(
                     'status' => 'success',
-                    'message' => 'Category deleted successfully.',
+                    'message' => 'User account deleted successfully.',
                 );
             }
         }
@@ -63,63 +67,88 @@ class Category
         echo json_encode($result);
     }
 
-    public function get_category_info($id) {
-        $stmt = $this->conn->prepare("SELECT * FROM category WHERE id = :id");
+    public function get_user_info($id)
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE id = :id");
         $stmt->bindParam(":id", $id, PDO::PARAM_INT);
         $stmt->execute();
 
-        if($stmt->rowCount() > 0) {
+        if ($stmt->rowCount() > 0) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
             $result = array(
                 'status' => 'success',
                 'id' => $row['id'],
-                'category' => $row['category'],
-                'details' => $row['details'],
-                'max_time' => $row['max_time'],
+                'username' => $row['username'],
             );
         } else {
             $result = array(
                 'status' => 'failed',
-                'message' => 'No category found.',
+                'message' => 'No user account found.',
             );
         }
 
         echo json_encode($result);
     }
 
-    public function edit_document($id, $category, $details, $max_time) {
-        $stmt = $this->conn->prepare("UPDATE category SET category = :category, details = :details, max_time = :max_time WHERE id = :id");
+    public function edit_user($id, $username, $password)
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE username = :username AND id != :id");
+        $stmt->bindParam(":username", $username, PDO::PARAM_STR);
         $stmt->bindParam(":id", $id, PDO::PARAM_INT);
-        $stmt->bindParam(":category", $category, PDO::PARAM_STR);
-        $stmt->bindParam(":details", $details, PDO::PARAM_STR);
-        $stmt->bindParam(":max_time", $max_time, PDO::PARAM_INT);
-    
-        if($stmt->execute()) {
+        $stmt->execute();
+
+        if($stmt->rowCount() > 0) {
             $result = array(
-                'status' => 'success',
-                'message' => ucfirst($category) . ' category updated successfully.',
+                'status' => 'failed',
+                'message' => ucwords($username) . ' username already exist.',
             );
+        } else {
+            if(!empty($password)) {
+                $stmt = $this->conn->prepare("UPDATE users SET username = :username, password = :password WHERE id = :id");
+                $hash = password_hash($password, PASSWORD_DEFAULT);
+                $stmt->bindParam(":username", $username, PDO::PARAM_STR);
+                $stmt->bindParam(":password", $hash, PDO::PARAM_STR);
+                $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+
+                if($stmt->execute()) {
+                    $result = array(
+                        'status' => 'success',
+                        'message' => 'User account updated successfully.',
+                    );
+                }
+            } else {
+                $stmt = $this->conn->prepare("UPDATE users SET username = :username WHERE id = :id");
+                $stmt->bindParam(":username", $username, PDO::PARAM_STR);
+                $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+
+                if($stmt->execute()) {
+                    $result = array(
+                        'status' => 'success',
+                        'message' => 'User account updated successfully.',
+                    );
+                }
+            }
         }
 
         echo json_encode($result);
     }
 }
 
-$Cat = new Category($pdo);
+$User = new Users($pdo);
 
-if(isset($_POST['add_category'])) {
-    $Cat->add_category($_POST['add_category_name'], $_POST['add_details'], $_POST['add_max_time']);
+if (isset($_POST['add_user'])) {
+    $User->add_user($_POST['add_username'], $_POST['add_password']);
 }
 
-if(isset($_POST['delete_category'])) {
-    $Cat->delete_category($_POST['id']);
+if (isset($_POST['delete_user'])) {
+    $User->delete_user($_POST['id']);
 }
 
-if(isset($_POST['get_category_info'])) {
-    $Cat->get_category_info($_POST['category_id']);
+if (isset($_POST['get_user_info'])) {
+    $User->get_user_info($_POST['user_id']);
 }
 
-if(isset($_POST['edit_category'])) {
-    $Cat->edit_document($_POST['edit_category_id'], $_POST['edit_category_name'], $_POST['edit_details'], $_POST['edit_max_time']); 
+if (isset($_POST['edit_user'])) {
+    $User->edit_user($_POST['edit_user_id'], $_POST['edit_username'], $_POST['edit_password']);
 }

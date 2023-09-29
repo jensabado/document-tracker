@@ -47,7 +47,7 @@ if(!isset($_SESSION['dt_admin_id'])) {
             <nav class="navbar navbar-expand-lg main-navbar" style="position: fixed; top: 0; z-index:200;">
                 <form class="form-inline mr-auto">
                     <ul class="navbar-nav mr-3">
-                        <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i
+                        <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg d-block d-lg-none"><i
                                     class="fas fa-bars"></i></a></li>
                     </ul>
                 </form>
@@ -144,8 +144,7 @@ if(!isset($_SESSION['dt_admin_id'])) {
 
         let form = new FormData();
         form.append('logout', true);
-        form.append('id', 'dt_admin_id');
-        form.append('username', 'dt_admin_username');
+        form.append('type', 'admin');
 
         $.ajax({
             type: "POST",

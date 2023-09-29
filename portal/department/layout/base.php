@@ -1,9 +1,7 @@
 <?php
-session_start();
-
 if(!isset($_SESSION['dt_dept_id'])) {
     echo '<script>
-    window.location.href = "../../login";
+    window.location.href = "../../index";
     </script>';
 }
 ?>
@@ -45,23 +43,22 @@ if(!isset($_SESSION['dt_dept_id'])) {
 <body>
     <div id="app">
         <div class="main-wrapper main-wrapper-1">
-            <div class="navbar-bg"></div>
-            <nav class="navbar navbar-expand-lg main-navbar">
+            <div class="navbar-bg" style="position: fixed; top: 0; z-index:100;"></div>
+            <nav class="navbar navbar-expand-lg main-navbar" style="position: fixed; top: 0; z-index:200;">
                 <form class="form-inline mr-auto">
                     <ul class="navbar-nav mr-3">
-                        <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i
+                        <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg d-block d-lg-none"><i
                                     class="fas fa-bars"></i></a></li>
                     </ul>
                 </form>
                 <ul class="navbar-nav navbar-right">
                     <li class="dropdown"><a href="#" data-toggle="dropdown"
                             class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-                            <img alt="image" src="../../assets/img/avatar/avatar-1.png" class="rounded-circle mr-1">
-                            <div class="d-sm-none d-lg-inline-block"><?= strtoupper($_SESSION['dt_dept_username']) ?></div>
+                            <div class="d-inline-block"><?= strtoupper($_SESSION['dt_dept_username']) ?></div>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a href="features-profile.html" class="dropdown-item has-icon">
-                                <i class="far fa-user"></i> Profile
+                            <a href="account-settings" class="dropdown-item has-icon">
+                                <i class="far fa-user"></i> Account Settings
                             </a>
                             <div class="dropdown-divider"></div>
                             <a href="javascript:void(0)" class="dropdown-item has-icon text-danger" id="logout">
@@ -87,18 +84,13 @@ if(!isset($_SESSION['dt_dept_id'])) {
                         <li class="menu-header">Modules</li>
                         <li><a class="nav-link" href="documents"><i class="fas fa-solid fa-file-lines"></i>
                                 <span>Documents</span></a></li>
-                        <li><a class="nav-link" href="category"><i class="fas fa-solid fa-folder-tree"></i>
-                                <span>Category</span></a></li>
-                        <li><a class="nav-link" href="department"><i class="fas fa-solid fa-building"></i>
-                                <span>Department</span></a></li>
-                        <li><a class="nav-link" href="track"><i class="fas fa-solid fa-magnifying-glass-location"></i>
+                        <li><a class="nav-link" href="document-scanner"><i class="fas fa-solid fa-qrcode"></i>
+                                <span>Scanner</span></a></li>
+                        <li><a class="nav-link" href="document-track"><i
+                                    class="fas fa-solid fa-magnifying-glass-location"></i>
                                 <span>Track Document</span></a></li>
-                        <li><a class="nav-link" href="user"><i class="fas fa-solid fa-users"></i>
-                                <span>Users</span></a></li>
-                        <li><a class="nav-link" href="archive"><i class="fas fa-solid fa-box-archive"></i>
-                                <span>Archive</span></a></li>
-                        <li><a class="nav-link" href="settings"><i class="fas fa-solid fa-gears"></i>
-                                <span>Settings</span></a></li>
+                        <!-- <li><a class="nav-link" href="settings"><i class="fas fa-solid fa-gears"></i>
+                                <span>Settings</span></a></li> -->
                         <!-- <li class="menu-header">Stisla</li>
                         <li class="dropdown">
                             <a href="#" class="nav-link has-dropdown"><i class="fas fa-th-large"></i>
@@ -149,8 +141,7 @@ if(!isset($_SESSION['dt_dept_id'])) {
 
         let form = new FormData();
         form.append('logout', true);
-        form.append('id', 'dt_admin_id');
-        form.append('username', 'dt_admin_username');
+        form.append('type', 'dept');
 
         $.ajax({
             type: "POST",

@@ -42,8 +42,7 @@ ob_start();
             </div>
             <div class="modal-footer bg-whitesmoke br">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" form="add_user_form"
-                    id="add_document_btn">Add</button>
+                <button type="submit" class="btn btn-primary" form="add_user_form" id="add_document_btn">Add</button>
                 <a href="#" class="btn disabled btn-primary btn-progress d-none spinner">Progress</a>
             </div>
         </div>
@@ -171,7 +170,7 @@ $(document).ready(function() {
             }
         },
         "order": [
-            [1, 'desc']
+            [2, 'desc']
         ],
         "lengthMenu": [
             [5, 10, 25, 50, -1],
@@ -196,11 +195,11 @@ $(document).ready(function() {
         e.preventDefault();
 
         let form = new FormData(this);
-        form.append('add_department', true);
+        form.append('add_user', true);
 
         $.ajax({
             type: "POST",
-            url: "../../backend/class/Department.php",
+            url: "../../backend/class/Users.php",
             data: form,
             processData: false,
             contentType: false,
@@ -257,14 +256,14 @@ $(document).ready(function() {
     $(document).on('click', '#get_edit', function(e) {
         e.preventDefault();
 
-        let department_id = $(this).data('id');
+        let user_id = $(this).data('id');
         let form = new FormData();
-        form.append('get_department_info', true);
-        form.append('department_id', department_id);
+        form.append('get_user_info', true);
+        form.append('user_id', user_id);
 
         $.ajax({
             type: "POST",
-            url: "../../backend/class/Department.php",
+            url: "../../backend/class/Users.php",
             data: form,
             processData: false,
             contentType: false,
@@ -275,9 +274,7 @@ $(document).ready(function() {
                 if (data.status == 'success') {
                     $('#show_modal').modal('hide');
                     $('#edit_modal').modal('show');
-                    $('#edit_department_id').val(data.id);
-                    $('#edit_department_name').val(data.department);
-                    $('#edit_code').val(data.code);
+                    $('#edit_user_id').val(data.id);
                     $('#edit_username').val(data.username);
                 } else if (data.status == 'failed') {
                     Swal.fire({
@@ -314,11 +311,11 @@ $(document).ready(function() {
         e.preventDefault();
 
         let form = new FormData(this);
-        form.append('edit_department', true);
+        form.append('edit_user', true);
 
         $.ajax({
             type: "POST",
-            url: "../../backend/class/Department.php",
+            url: "../../backend/class/Users.php",
             data: form,
             processData: false,
             contentType: false,
@@ -332,6 +329,19 @@ $(document).ready(function() {
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
+                        text: data.message,
+                        iconColor: '#5D87FF',
+                        confirmButtonColor: '#5D87FF',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        timerProgressBar: true,
+                        color: '#000',
+                        background: '#fff',
+                    })
+                } else if (data.status == 'failed') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed!',
                         text: data.message,
                         iconColor: '#5D87FF',
                         confirmButtonColor: '#5D87FF',
@@ -379,11 +389,11 @@ $(document).ready(function() {
             if (result.isConfirmed) {
                 let form = new FormData();
                 form.append('id', id);
-                form.append('delete_department', true);
+                form.append('delete_user', true);
 
                 $.ajax({
                     type: "POST",
-                    url: "../../backend/class/Department.php",
+                    url: "../../backend/class/Users.php",
                     data: form,
                     processData: false,
                     contentType: false,
